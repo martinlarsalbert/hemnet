@@ -7,6 +7,7 @@ import unicodedata
 import re
 import json
 import logging
+import os
 
 
 def simple_get(url):
@@ -45,6 +46,15 @@ def log_error(e):
     """
     print(e)
 
+
+def find_numbers(text):
+    regexp = re.compile('(\d+)')
+
+    results = regexp.findall(text)
+    price_str = ''
+    for result in results:
+        price_str += result
+    return float(price_str)
 
 def load_house_data(url):
     data = {}
@@ -89,12 +99,13 @@ def load_house_data(url):
     return data
 
 
-def get_data():
-
-    house_data = pd.DataFrame()
+def get_data(file_path):
 
     part1 = r'https://www.hemnet.se/salda/bostader?item_types%5B%5D=villa&item_types%5B%5D=radhus&item_types%5B%5D=bostadsratt&location_ids%5B%5D=17755&page='
     part2 = '&sold_age=all'
+
+    if os.path.exists(file_path):
+        os.remove(file_path)
 
     ok = True
     i = 0
@@ -105,6 +116,7 @@ def get_data():
             raw_html = simple_get(url=url)
             html = BeautifulSoup(raw_html, 'html.parser')
 
+            house_data = pd.DataFrame()
             for item_link_contaier in html.find_all(class_="item-link-container"):
                 try:
                     data = load_house_data(url=item_link_contaier['href'])
@@ -112,10 +124,17 @@ def get_data():
                     logging.exception('Skipping house')
                 else:
                     house_data = house_data.append(data)
+
+            #Saving (By appending):
+            logging.info('Saving data to:%s' % file_path)
+            house_data.to_csv(file_path, index=False, mode='a')
+
         except:
             ok = False
             logging.exception('Could not find page:%i' % i)
 
-def save_data(house_data,file_path):
 
-    house_data.to_csv(file_path)
+
+if __name__ == '__main__':
+
+    house_data = get_data(file_path='all_house_data.csv')
