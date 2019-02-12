@@ -111,7 +111,7 @@ def get_data(file_path):
 
     ok = True
     i = 0
-    old_house_data = pd.read_csv(file_path)
+    old_house_data = pd.read_csv(os.path.join(r'/home/marale/hemnet/',file_path))
     checked_urls = old_house_data['url']
     old_house_data = None
 
