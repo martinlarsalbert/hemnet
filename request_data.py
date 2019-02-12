@@ -109,17 +109,25 @@ def get_data(file_path):
 
     ok = True
     i = 0
+    old_house_data = pd.read_csv(file_path)
+    checked_urls = old_house_data['url']
+    old_house_data = None
+
     while ok:
         i += 1
         try:
             url = part1 + '%i' % i + part2
+            logging.info('Loading data from url:%s' % url)
             raw_html = simple_get(url=url)
             html = BeautifulSoup(raw_html, 'html.parser')
 
             house_data = pd.DataFrame()
             for item_link_contaier in html.find_all(class_="item-link-container"):
+                house_url = item_link_contaier['href']
+                if house_url in checked_urls:
+                    continue
                 try:
-                    data = load_house_data(url=item_link_contaier['href'])
+                    data = load_house_data(url=house_url)
                 except:
                     logging.exception('Skipping house')
                 else:
