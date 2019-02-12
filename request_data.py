@@ -102,7 +102,7 @@ def load_house_data(url):
 
 def get_data(file_path):
 
-    logging.info('Running from:%s' % os.path.abs(''))
+    logging.info('Running from:%s' % os.path.abspath(''))
     part1 = r'https://www.hemnet.se/salda/bostader?item_types%5B%5D=villa&item_types%5B%5D=radhus&item_types%5B%5D=bostadsratt&location_ids%5B%5D=17755&page='
     part2 = '&sold_age=all'
 
