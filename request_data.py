@@ -147,4 +147,4 @@ def get_data(file_path):
 
 if __name__ == '__main__':
 
-    house_data = get_data(file_path='all_house_data.csv')
+    house_data = get_data(file_path='all_house_data_new.csv')
