@@ -160,4 +160,5 @@ def get_data(file_path,i_max = None):
 if __name__ == '__main__':
 
     file_path = sys.argv[1]
+    print(file_path)
     house_data = get_data(file_path=file_path)
