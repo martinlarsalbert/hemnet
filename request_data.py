@@ -9,7 +9,7 @@ import json
 import logging
 logging.basicConfig(filename='example.log',level=logging.DEBUG)
 import os
-
+import sys
 
 def simple_get(url):
     """
@@ -159,4 +159,5 @@ def get_data(file_path,i_max = None):
 
 if __name__ == '__main__':
 
-    house_data = get_data(file_path='all_house_data_new.csv')
+    file_path = sys.argv[1]
+    house_data = get_data(file_path='file_path')
