@@ -57,6 +57,7 @@ def find_numbers(text):
         price_str += result
     return float(price_str)
 
+
 def load_house_data(url):
     data = {}
 
@@ -66,7 +67,7 @@ def load_house_data(url):
     item = html_.find(class_='sold-property__price')
     text = item.find(class_='sold-property__price-value').text
     text_ = unicodedata.normalize('NFKD', text)
-    data['price'] = find_numbers(text=text_)
+    data['price'] = text_
 
     item = html_.find(class_='sold-property__details')
     attribute_names = []
@@ -87,23 +88,28 @@ def load_house_data(url):
 
     listing = map_data['listing']
     data['id'] = listing['id']
-    data['coordinate'] = listing['coordinate']
-    data['type'] = listing['type']
-    data['address'] = listing['address']
-    data['map_url'] = map_data['map_url']
-    data['url'] = listing['url']
-    data['sale_date'] = listing['sale_date']
+    data['coordinate'] = listing.get('coordinate')
+    data['type'] = listing.get('type')
+    if not data['type']:
+        data['type'] = listing.get('typeSummary')
+        if not data['type']:
+            data['type'] = listing.get('iconName')
+
+    data['address'] = listing.get('address')
+    data['map_url'] = map_data.get('map_url')
+    data['url'] = listing.get('url')
+    data['sale_date'] = listing.get('sale_date')
 
     data = pd.Series(data)
     data.name = data['id']
 
-    return data
+    return data, map_data
 
 
-def get_data(file_path):
+def get_data(file_path,i_max = None):
 
     logging.info('Running from:%s' % os.path.abspath(''))
-    part1 = r'https://www.hemnet.se/salda/bostader?item_types%5B%5D=villa&item_types%5B%5D=radhus&item_types%5B%5D=bostadsratt&location_ids%5B%5D=17755&page='
+    part1 = r'https://www.hemnet.se/salda/bostader?item_types%5B%5D=villa&item_types%5B%5D=radhus&location_ids%5B%5D=17920&location_ids%5B%5D=17997&location_ids%5B%5D=17858&location_ids%5B%5D=17944&location_ids%5B%5D=17979&location_ids%5B%5D=17973&location_ids%5B%5D=18030&location_ids%5B%5D=17865&page='
     part2 = '&sold_age=all'
 
     #if os.path.exists(file_path):
@@ -111,12 +117,18 @@ def get_data(file_path):
 
     ok = True
     i = 0
-    old_house_data = pd.read_csv(os.path.join(r'/home/marale/hemnet/',file_path))
-    checked_urls = old_house_data['url']
-    old_house_data = None
+    checked_urls = []
+    if os.path.exists(file_path):
+        old_house_data = pd.read_csv(os.path.join(file_path))
+        checked_urls = old_house_data['url']
 
     while ok:
-        i += 1
+        i+= 1
+
+        if not i_max is None:
+            if i > i_max:
+                break
+
         try:
             url = part1 + '%i' % i + part2
             logging.info('Loading data from url:%s' % url)
