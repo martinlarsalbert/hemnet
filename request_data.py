@@ -103,14 +103,14 @@ def load_house_data(url):
     data = pd.Series(data)
     data.name = data['id']
 
-    return data, map_data
+    return data
 
 
 def get_data(file_path,i_max = None):
 
     logging.info('Running from:%s' % os.path.abspath(''))
     part1 = r'https://www.hemnet.se/salda/bostader?item_types%5B%5D=villa&item_types%5B%5D=radhus&location_ids%5B%5D=17920&location_ids%5B%5D=17997&location_ids%5B%5D=17858&location_ids%5B%5D=17944&location_ids%5B%5D=17979&location_ids%5B%5D=17973&location_ids%5B%5D=18030&location_ids%5B%5D=17865&page='
-    part2 = '&sold_age=all'
+    part2 = r'&sold_age=all'
 
     #if os.path.exists(file_path):
     #    os.remove(file_path)
