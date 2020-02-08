@@ -7,7 +7,7 @@ import unicodedata
 import re
 import json
 import logging
-logging.basicConfig(filename='example.log',level=logging.DEBUG)
+logging.basicConfig(filename='hemnet.log',level=logging.INFO)
 import os
 import sys
 
