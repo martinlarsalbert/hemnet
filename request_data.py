@@ -103,13 +103,15 @@ def load_house_data(url):
     data = pd.Series(data)
     data.name = data['id']
 
+    #data.drop(index='Prisutveckling', inplace=True)
+
     return data
 
 
 def get_data(file_path,i_max = None):
 
     logging.info('Running from:%s' % os.path.abspath(''))
-    part1 = r'https://www.hemnet.se/salda/bostader?item_types%5B%5D=villa&item_types%5B%5D=radhus&location_ids%5B%5D=17920&location_ids%5B%5D=17997&location_ids%5B%5D=17858&location_ids%5B%5D=17944&location_ids%5B%5D=17979&location_ids%5B%5D=17973&location_ids%5B%5D=18030&location_ids%5B%5D=17865&page='
+    part1 = r'https://www.hemnet.se/salda/bostader?item_types%5B%5D=villa&item_types%5B%5D=radhus&location_ids%5B%5D=17783&location_ids%5B%5D=18010&location_ids%5B%5D=18030&page='
     part2 = r'&sold_age=all'
 
     #if os.path.exists(file_path):
@@ -119,8 +121,27 @@ def get_data(file_path,i_max = None):
     i = 0
     checked_urls = []
     if os.path.exists(file_path):
-        old_house_data = pd.read_csv(os.path.join(file_path))
+        old_house_data = pd.read_csv(os.path.join(file_path), sep=';')
         checked_urls = old_house_data['url']
+
+    columns = ['Antal rum',
+               'Begärt pris',
+               'Boarea',
+               'Byggår',
+               'Driftskostnad',
+               'Pris per kvadratmeter',
+               'Tomtarea',
+               'address',
+               'coordinate',
+               'id',
+               'map_url',
+               'price',
+               'sale_date',
+               'type',
+               'url',
+               'Biarea',
+               'Avgift/månad',
+               'Prisutveckling',]
 
     while ok:
         i+= 1
@@ -135,7 +156,8 @@ def get_data(file_path,i_max = None):
             raw_html = simple_get(url=url)
             html = BeautifulSoup(raw_html, 'html.parser')
 
-            house_data = pd.DataFrame()
+            house_data = pd.DataFrame(columns=columns)
+
             for item_link_contaier in html.find_all(class_="item-link-container"):
                 house_url = item_link_contaier['href']
                 if house_url in checked_urls:
@@ -149,7 +171,7 @@ def get_data(file_path,i_max = None):
 
             #Saving (By appending):
             logging.info('Saving data to:%s' % file_path)
-            house_data.to_csv(file_path, index=False, mode='a')
+            house_data[columns].to_csv(file_path, index=False, mode='a', sep=';')
 
         except:
             ok = False
